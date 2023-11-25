@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>購物車系統</title>
+    <!-- 標題 -->
+    {% if error|length != 0 %}
+        {% for i in error %}
+        <script>
+            var error = "{{i}}"
+            alert(error);
+        </script>
+        {% endfor %}
+    {% endif %}
+
+</head>
+<body>
+    <h1>首頁-商家 <br/></h1>
+    <!-- 登出按鈕 -->
+    <button type='button' id='log_out'>登出</button>
+    
+    <!-- 全部商品清單 -->
+    <table border="2">
+        <tr>
+            <td colspan="4">全部商品清單</td>
+        </tr>
+
+    {% for product in all_products %}
+        <tr>
+            <td><span><b>商品代號： </b></span>{{ product.0 }}</td>
+            <td><span><b>商品名稱： </b></span>{{ product.1 }}</td>
+            <td><span><b>商品價格： </b></span>{{ product.2 }}</td>
+            <td><span><b>商品數量： </b></span>{{ product.3 }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    
+    <!-- 新增商品表單 -->
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span><b>新增</b></span>
+        {{ insertProduct.as_p }}
+        <input name='insert' type="submit"></input>
+    </form>
+    
+    <!-- 刪除商品表單 -->
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span><b>刪除</b></span>
+        {{ delProduct.as_p }}
+        <input name='del' type="submit"></input>
+    </form>
+    
+    <!-- 更新商品表單 -->
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span><b>更新商品</b></span>
+        {{ updateProduct.as_p }}
+        <input name='update' type="submit"></input>
+    </form>
+    <br/>
+    
+    <!-- 已付款但尚未出貨之購物車商品 -->
+    <table border="2">
+        <tr>
+            <td colspan="4">已付款但尚未出貨的商品(購物車內)</td>
+        </tr>
+        {% for product in cart_products %}
+            <tr>
+                <td><span><b>購物車代號</b></span>{{ product.0 }}</td>
+                <td><span><b>購買者代號</b></span>{{ product.1 }}</td>
+                <td><span><b>商品代號</b></span>{{ product.2 }}</td>
+                <td><span><b>商品數量</b></span>{{ product.3 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    
+    <!-- 寄出商品表單 -->
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span><b>寄出商品</b></span>
+        {{ deliverProduct.as_p }}
+        <input name='deliver' type="submit"></input>
+    </form>
+	<style>
+		td { 
+			text-align : center;
+		}
+	</style>
+    <script>
+		function getId(id) {
+			return document.getElementById(id);
+		}
+
+		getId('log_out').addEventListener('click', logOut);
+
+		function logOut() {
+			window.location.href = '/';
+		}
+	</script>
+</body>
+</html>

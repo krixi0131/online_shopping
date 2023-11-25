@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>線上購物系統 - 登入</title>
+    {% if error|length != 0 %}
+        {% for i in error %}
+        <script>
+            var error = "{{i}}"
+            alert(error);
+        </script>
+        {% endfor %}
+    {% endif %}
+</head>
+<body>
+    <h1>線上購物網站</h1>
+    <h2>-預設帳號-</h2>
+    
+    <p><b>商家帳號: 1，密碼: 1</b></p>
+    <p><b>客戶帳號: 2，密碼: 2</b></p>
+
+    {% if error %}
+        <script>
+            // 檢查 error_json 是否為有效的JSON格式
+            var error_json = '{{ error_json | escapejs | safe}}'; // 使用 safe 過濾器
+            if (error_json.trim().length > 0) {
+                try {
+                    var errors = JSON.parse(error_json);
+                    alert(errors.join('\n')); // 以單一警示框顯示所有錯誤訊息
+                } catch (error) {
+                    console.error('Invalid JSON format:', error);
+                }
+            }
+        </script>
+    {% endif %}
+
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {{ form_login.as_p }}
+        <input type="submit" value="登入"></input>
+    </form>
+</body>
+</html>
