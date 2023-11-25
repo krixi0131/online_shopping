@@ -35,7 +35,7 @@
 <img width="3680" alt="3a flowchart" src="https://github.com/krixi0131/online_shopping/assets/116014300/94dbbdf7-cb24-46e1-a4d1-b19df58d88fd">
 
 ## Schema
-![3a schema](https://github.com/krixi0131/online_shopping/assets/116014300/b6d42eac-e286-481d-adae-a094035eff6e)
+![3a schema](https://github.com/krixi0131/online_shopping/assets/116014300/9fb4efe0-998e-4499-9d4c-b645526dc93a)
 
 
 
