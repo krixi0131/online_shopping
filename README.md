@@ -31,7 +31,7 @@
 商家也可以在任何時候編輯商品內容，包括價格、描述、規格等，以確保商品信息的準確性。
 
 ## 流程圖
-<img width="3680" alt="3a flowchart" src="https://github.com/krixi0131/online-shopping/assets/116014300/5993130d-2b30-49c0-8470-709630f592ae">
+<img width="3680" alt="3a flowchart" src="https://github.com/krixi0131/online_shopping/assets/116014300/94dbbdf7-cb24-46e1-a4d1-b19df58d88fd">
 
 
 
