@@ -44,6 +44,7 @@ def customerMain(request) : # 顧客主頁面
         insert = insertCart(request.POST)
         delete = delCart(request.POST)
         count = countCart(request.POST)
+        
         if request.method == 'POST' : # POST
             if 'insert' in request.POST : # 新增商品
                cursor.execute("select * from cart_product where `stock` > 0") # 還有庫存的商品
@@ -80,6 +81,8 @@ def customerMain(request) : # 顧客主頁面
         cursor.execute("select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0") # find the reserved products
         reserved_products = cursor.fetchall()
         all_products = takeZero(rmReversed(arrayOf(all_products), reserved_products)) # turn tuple to list
+        #print(all_products)
+        print(cart_products)
         context = {'count' : count, 'delete' : delete, 'error' : error, 'user' : user, 'title' : title, 'all_products' : all_products, 'insert' : insert, 'cart_products' : cart_products}
         return render(request, 'customerMain.html', context) 
     else :
