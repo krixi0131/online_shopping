@@ -41,11 +41,12 @@
         {% for cart_product in cart_products %}
             <tr>
                 <td><span><b>購物車序號:</b></span>{{ cart_product.0 }}</td>
-                <td><span><b>商品代號：</b></span>{{ cart_product.2 }}</td>
-                <td><span><b>商品數量：</b></span>{{ cart_product.3 }}</td>
+                <td><span><b>商品代號：</b></span>{{ cart_product.4 }}</td>
+                <td><span><b>商品數量：</b></span>{{ cart_product.1 }}</td>
                 {% for product in all_products %}
-                    {% if product.0 == cart_product.2 %}
-                        <td><span><b>單筆價格:</b></span>{% widthratio product.2 1 cart_product.3 %}</td>
+                    {% if product.0 == cart_product.4 %}
+                        <td><span><b>單價:</b></span>{{ product.2 }}</td>
+                        <td><span><b>總價:</b></span>{% widthratio product.2 1 cart_product.1 %}</td>
                     {% endif %}
                 {% endfor %}
             </tr>
