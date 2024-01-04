@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>線上購物系統 - 註冊</title>
+</head>
+<body>
+    <h1>線上購物網站</h1>
+    <h2>註冊新用戶</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="title">身份:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="pwd">密碼:</label><br>
+        <input type="password" id="pwd" name="pwd"><br>
+        <input type="submit" value="送出">
+    </form>
+    <a href="login.html">已有帳號？點此登入</a>
+</body>
+</html>
