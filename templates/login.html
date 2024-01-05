@@ -3,17 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>線上購物系統 - 登入</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+    </style>
+
     {% if error|length != 0 %}
-        {% for i in error %}
-        <script>
-            var error = "{{i}}"
-            alert(error);
-        </script>
-        {% endfor %}
-    {% endif %}
+    {% for i in error %}
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-danger" role="alert">
+                {{ i }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+
 </head>
 <body>
-    <h1>線上購物網站</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1 class="text-center mt-5">線上購物網站</h1>
+            </div>
+        </div>
+
     <h2>-預設帳號-</h2>
     
     <p><b>商家帳號: 1，密碼: 1</b></p>
@@ -34,11 +52,25 @@
         </script>
     {% endif %}
 
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">登入</h3>
+                </div>
+                <div class="card-body">
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         {{ form_login.as_p }}
         <input type="submit" value="登入"></input>
         <button onclick="location.href='register/'">註冊</button>
     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
 </body>
 </html>

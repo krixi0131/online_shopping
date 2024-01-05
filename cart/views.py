@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db import connection
 from .form import login, insertProduct, delProduct, updateProduct, insertCart, delCart, countCart, deliverProduct
+
 #from .controller import loginController
 import json
 
@@ -94,6 +95,8 @@ def sellerMain(request) : # 管理者主頁面
     if (user and title == 'seller') : # 是管理者
         error = []
         cursor = connection.cursor()
+        cursor.execute("select * from cart_product where `sellerID` = %s;", [user])
+        cart_products = cursor.fetchall()
         insert = insertProduct(request.POST)
         delete = delProduct(request.POST)
         update = updateProduct(request.POST)
@@ -134,6 +137,27 @@ def sellerMain(request) : # 管理者主頁面
         return render(request, 'sellerMain.html', context) 
     else :
         return loginPage(request)
+
+
+def Register(request):  # 註冊
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        pwd = request.POST.get('pwd')
+        pwd = int(pwd)
+        name = request.POST.get('name')
+
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT INTO cart_user (pwd, title, name) VALUES (%s, %s, %s)", [pwd, title, name])
+            cursor.execute("SELECT LAST_INSERT_ID()") # get the last insert id
+            result = cursor.fetchone()
+            if result is not None:
+                no = result[0]
+            else:
+                messages.error(request, '註冊失敗，請再試一次。')
+
+        return redirect('/')
+
+    return render(request, 'register.html', context={'title': '註冊'})
 
 def arrayOf(tup) : # turn tuple to array
     total_array = []

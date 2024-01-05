@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>購物車系統</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <!-- JavaScript 中的錯誤處理 -->
     {% if error|length != 0 %}
         {% for i in error %}
@@ -17,7 +21,7 @@
     <!-- 標題 -->
     <h1>首頁-客戶<br/></h1>
     <!-- 登出按鈕 -->
-    <button type='button' id='log_out'>登出</button>
+    <button type='button' id='log_out' class='btn btn-primary'>登出</button>
     
     <!-- 尚有庫存之貨品清單 -->
     <div>尚有庫存之貨品清單</div>
