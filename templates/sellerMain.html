@@ -59,29 +59,48 @@
         <input name='update' type="submit"></input>
     </form>
     <br/>
-    
-    <!-- 已付款但尚未出貨之購物車商品 -->
-    <table border="2">
+
+    <table border="3">
         <tr>
-            <td colspan="4">已付款但尚未出貨的商品(購物車內)</td>
+            <td colspan="4">客戶已下訂的訂單</td>
         </tr>
-        {% for product in cart_products %}
+        {% for sell_order_product in sell_order_products %}
             <tr>
-                <td><span><b>購物車代號</b></span>{{ product.0 }}</td>
-                <td><span><b>購買者代號</b></span>{{ product.1 }}</td>
-                <td><span><b>商品代號</b></span>{{ product.2 }}</td>
-                <td><span><b>商品數量</b></span>{{ product.3 }}</td>
+                <td><span><b>購物車序號:</b></span>{{ sell_order_product.0 }}</td>
+                <td><span><b>購物車狀態:</b></span>{{ sell_order_product.4 }}</td>
             </tr>
         {% endfor %}
     </table>
-    
+
+    <!-- 確認訂單 表單 -->
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span><b>要進行確認的訂單</b></span>
+        {{ confirmOrder.as_p }}
+        <input name='confirm' type="submit"></input>
+    </form>
+
+    <table border="3">
+        <tr>
+            <td colspan="4">已確認好 等待出貨的訂單</td>
+        </tr>
+        {% for sell_deliver_product in sell_deliver_products %}
+            <tr>
+                <td><span><b>購物車序號:</b></span>{{ sell_deliver_product.0 }}</td>
+                <td><span><b>購物車狀態:</b></span>{{ sell_deliver_product.4 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
     <!-- 寄出商品表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
-        <span><b>寄出商品</b></span>
+        <span><b>要包裝出貨的訂單</b></span>
         {{ deliverProduct.as_p }}
         <input name='deliver' type="submit"></input>
     </form>
+
+
 	<style>
 		td { 
 			text-align : center;

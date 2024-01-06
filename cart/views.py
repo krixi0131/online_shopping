@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db import connection
-from .form import login, insertProduct, delProduct, updateProduct, insertCart, delCart, countCart, deliverProduct
+from .form import login, insertProduct, delProduct, updateProduct, insertCart, delCart, countCart, deliverProduct,confirmOrder
 #from .controller import loginController
 import json
 from django.contrib import messages
@@ -47,6 +47,7 @@ def sellerMain(request) : # 管理者主頁面
         delete = delProduct(request.POST)
         update = updateProduct(request.POST)
         deliver = deliverProduct(request.POST)
+        confirm = confirmOrder(request.POST)
         if request.method == 'POST' :
             if 'insert' in request.POST : # 新增商品
                 name = request.POST['name']
@@ -62,26 +63,56 @@ def sellerMain(request) : # 管理者主頁面
                 price = request.POST['price']
                 amount = request.POST['amount']
                 cursor.execute("update cart_product set `price` = %s, `stock` = %s, `name` = %s where `no` = %s", (price, amount, name, product,))
-            if 'deliver' in request.POST : # 刪除商品
+            
+            if 'confirm' in request.POST : # 刪除商品
+                print(request.POST)
                 cId = request.POST['cId']
-                if 0 == cursor.execute("update cart_shopcart set `delivered` = 1 where `no` = %s and `delivered` = 0", (cId,)) : # update cart product to is delivered where it is not deliver
-                    error.append('can not deliver, as no this product Id') # product is none
+                if 0 == cursor.execute("update cart_shopcart set `order_status` = '處理中' where `no` = %s and `order_status`='未處理'", (cId,)) : # update cart product to is delivered where it is not deliver
+                    error.append('can not confirm, as no this product Id') # product is none
                 else :
-                   cursor.execute('select `product`, `amount` from cart_shopcart where `no` = %s', (cId,)) # find the stock
+                   cursor.execute('select `product`, `amount`,`order_status` from cart_shopcart where `no` = %s', (cId,)) # find the stock
                    cart_product = cursor.fetchone()
                    product = cart_product[0] # the product Id of cart product
                    amount = cart_product[1] # the amount of cart product
+                   order_status = cart_product[2]
                    cursor.execute('select `stock` from cart_product where `no` = %s', (product,)) # find the stock
                    product_stock = cursor.fetchone()[0] # this product original stock
                    changed_num = product_stock - amount # original stock - are buy
                    cursor.execute('update cart_product set `stock` = %s where `no` = %s', (changed_num, product,))
+                   cursor.execute('update cart_shopcart set `order_status`="處理中" where `no` = %s and `user` = %s', (cId, user))
+
+            if 'deliver' in request.POST : # 刪除商品
+                cId = request.POST['cId']
+                if 0 == cursor.execute("update cart_shopcart set `order_status` = '已寄送' where `no` = %s and `order_status`='處理中'", (cId,)) :
+                    error.append('can not deliver, as no this product Id') # product is none
+                else :
+                   cursor.execute('select `product`, `amount`,`order_status` from cart_shopcart where `no` = %s', (cId,)) # find the stock
+                   cart_product = cursor.fetchone()
+                   product = cart_product[0] # the product Id of cart product
+                   amount = cart_product[1] # the amount of cart product
+                   order_status = cart_product[2]
+                   cursor.execute('select `stock` from cart_product where `no` = %s', (product,)) # find the stock
+                   product_stock = cursor.fetchone()[0] # this product original stock
+                   cursor.execute('update cart_shopcart set `order_status`="寄送中" where `no` = %s and `user` = %s', (cId, user))
+
+                   #changed_num = product_stock - amount # original stock - are buy
+                   #cursor.execute('update cart_product set `stock` = %s where `no` = %s', (changed_num, product,))
+                   
+
+        cursor.execute("select * from cart_shopcart where `order_status` = '未處理'")
+        sell_order_products = cursor.fetchall()
+
+        cursor.execute("select * from cart_shopcart where `order_status` = '處理中'")
+        sell_deliver_products = cursor.fetchall()
+
         cursor.execute("select * from cart_product")
         all_products = cursor.fetchall()
+
         cursor.execute("select * from cart_shopcart where `paid` = 1 and `delivered` = 0;") # the cart product is paid and not delivered yet
         cart_products = cursor.fetchall()
-        context = {'error' : error, 'cart_products' : cart_products, 'deliverProduct' : deliver, 'user' : user, 'title' : title, 'insertProduct' : insert, 'delProduct' : delete, 'updateProduct' : update, "all_products" : all_products}
+        context = {'error' : error, 'cart_products' : cart_products, 'deliverProduct' : deliver, 'user' : user, 'title' : title, 'insertProduct' : insert, 'delProduct' : delete, 'updateProduct' : update, "all_products" : all_products, 'sell_order_products' : sell_order_products,'sell_deliver_products':sell_deliver_products, 'confirmOrder' : confirm}
         return render(request, 'sellerMain.html', context) 
-    else :
+    else :  
         return loginPage(request)
     
 def customerMain(request) : # 顧客主頁面
@@ -118,12 +149,18 @@ def customerMain(request) : # 顧客主頁面
                    error.append('can not delete, as no this id in your cart')
             if 'count' in request.POST : # 新增商品
                #cId = request.POST['cId'] # 商品代號
-               cursor.execute('select `product`, `amount` from cart_shopcart where `user` = %s and `delivered` = 0 and `paid` = 0', (user,)) # cart product is in cart and be counted
+               cursor.execute('select `user`,`product`, `amount`, `order_status` from cart_shopcart where `user` = %s and `delivered` = 0 and `paid` = 0', (user,)) # cart product is in cart and be counted
                cart_product = cursor.fetchall()
+               #print('1cart_product:', cart_product)
                if (len(cart_product) == 0) :
-                   error.append('can not update, as no product in your cart')
+                   error.append('can not update, as no product in your cart!')
                else : # count successful
-                   cursor.execute('update cart_shopcart set `paid` = 1 where `user` = %s and `delivered` = 0', (user,)) # set cart product is paid
+                    cursor.execute('update cart_shopcart set `paid` = 1  where `user` = %s ', (user,)) # set cart product is paid
+                    cursor.execute('update cart_shopcart set `order_status` = "未處理"  where `user` = %s ', (user,))
+                    
+        cursor.execute("select * from cart_shopcart where `user` = %s ", (user,))
+        order_products = cursor.fetchall()     
+
         cursor.execute("select * from cart_shopcart where `user` = %s and `paid` = 0", (user,)) # 該使用者還沒刪除的購物車商品
         cart_products = cursor.fetchall()
         cursor.execute("select * from cart_product where `stock` > 0") # 還有庫存的商品
@@ -131,7 +168,7 @@ def customerMain(request) : # 顧客主頁面
         cursor.execute("select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0") # find the reserved products
         reserved_products = cursor.fetchall()
         all_products = takeZero(rmReversed(arrayOf(all_products), reserved_products)) # turn tuple to list
-        context = {'count' : count, 'delete' : delete, 'error' : error, 'user' : user, 'title' : title, 'all_products' : all_products, 'insert' : insert, 'cart_products' : cart_products}
+        context = {'count' : count, 'delete' : delete, 'error' : error, 'user' : user, 'title' : title, 'all_products' : all_products, 'insert' : insert, 'cart_products' : cart_products, 'order_products' : order_products}
         return render(request, 'customerMain.html', context) 
     else :
         return loginPage(request)

@@ -18,6 +18,7 @@ class updateProduct(forms.Form) : # 更新商品
     price = forms.CharField(required=False, label = '商品價格', widget= forms.TextInput(attrs={'placeholder':'price', 'required' : True}))
     amount = forms.CharField(required=False, label = '商品數量', widget= forms.TextInput(attrs={'placeholder':'amount', 'required' : True}))
 
+
 class insertCart(forms.Form) : # 新增至購物車
     product = forms.CharField(required=False, label = '商品代號', widget= forms.TextInput(attrs={'placeholder':'product Id', 'required' : True}))
     amount = forms.CharField(required=False, label = '商品數量', widget= forms.TextInput(attrs={'placeholder':'amount', 'required' : True}))
@@ -27,6 +28,9 @@ class delCart(forms.Form) : # 刪除商品
 
 class countCart(forms.Form) : # 刪除商品
     cId = forms.CharField(required=False, label = '購物車代號')
+
+class confirmOrder(forms.Form) : # 更新商品
+    cId = forms.CharField(required=False, label = '購物車代號', widget= forms.TextInput(attrs={'placeholder':'cart product Id', 'required' : True}))
 
 class deliverProduct(forms.Form) : # 刪除商品
     cId = forms.CharField(required=False, label = '購物車代號', widget= forms.TextInput(attrs={'placeholder':'cart product Id', 'required' : True}))

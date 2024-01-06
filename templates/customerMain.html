@@ -41,10 +41,10 @@
         {% for cart_product in cart_products %}
             <tr>
                 <td><span><b>購物車序號:</b></span>{{ cart_product.0 }}</td>
-                <td><span><b>商品代號：</b></span>{{ cart_product.4 }}</td>
+                <td><span><b>商品代號：</b></span>{{ cart_product.5 }}</td>
                 <td><span><b>商品數量：</b></span>{{ cart_product.1 }}</td>
                 {% for product in all_products %}
-                    {% if product.0 == cart_product.4 %}
+                    {% if product.0 == cart_product.5 %}
                         <td><span><b>單價:</b></span>{{ product.2 }}</td>
                         <td><span><b>總價:</b></span>{% widthratio product.2 1 cart_product.1 %}</td>
                     {% endif %}
@@ -54,7 +54,7 @@
     </table>
     
     <!-- 新增至購物車表單 -->
-    <form enctype="multipart/form-data" method="post">
+    <form enctype="multipart/form-data" method="post" id = "insert_from">
         {% csrf_token %}
         <span>商品新增至購物車</span>
         {{ insert.as_p }}
@@ -76,6 +76,16 @@
         <span>結算購物車內商品</span>
         <input name='count' type="submit"></input>
     </form>
+    
+    <table border="3">
+        {% for order_product in order_products %}
+            <tr>
+                <td><span><b>購物車序號:</b></span>{{ order_product.0 }}</td>
+                <td><span><b>商品代號：</b></span>{{ order_product.5 }}</td>
+                <td><span><b>購物車狀態:</b></span>{{ order_product.4 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 </body>
 
 <script>
@@ -84,9 +94,13 @@
     }
 
     getId('log_out').addEventListener('click', logOut);
+    
 
     function logOut() {
         window.location.href = '/';
     }
+    
+    getId("id_product").value = ""
+    getId("id_amount").value = ""
 </script>
 </html>
