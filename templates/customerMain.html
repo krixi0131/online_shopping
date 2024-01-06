@@ -69,13 +69,15 @@
         {{ delete.as_p }}
         <input name='delete' type="submit"></input>
     </form>
-    
+
     <!-- 結算購物車表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span>結算購物車內商品</span>
+        {{ count.as_p }}
         <input name='count' type="submit"></input>
     </form>
+
     
     <table border="3">
         {% for order_product in order_products %}
@@ -88,6 +90,16 @@
             </tr>
         {% endfor %}
     </table>
+
+
+    <!-- 收貨 -->
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span>向物流收貨</span>
+        {{ getCart.as_p }}
+        <input name='getC' type="submit"></input>
+    </form>
+
 </body>
 
 <script>
@@ -109,7 +121,7 @@
     //getId('evaluate').addEventListener('onclick', evaluate);
 
     async function eva(status, id) {
-        if (status == "已寄送"){
+        if (status == "已送達"){
             let grade = prompt("請填入評價滿意度(1~5)");
             //如果grade不是1~5的數字
             if (grade < 1 || grade > 5 || isNaN(grade)){
@@ -128,8 +140,6 @@
                     body: JSON.stringify(data)
                 });
                 const content = await rawResponse;
-
-                console.log(content);
             }
             
         }

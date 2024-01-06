@@ -75,14 +75,14 @@
     <!-- 確認訂單 表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
-        <span><b>要進行確認的訂單</b></span>
+        <span><b>收到的訂單 進行確認</b></span>
         {{ confirmOrder.as_p }}
         <input name='confirm' type="submit"></input>
     </form>
 
     <table border="3">
         <tr>
-            <td colspan="4">已確認好 等待出貨的訂單</td>
+            <td colspan="4">已確認過 等待出貨的訂單</td>
         </tr>
         {% for sell_deliver_product in sell_deliver_products %}
             <tr>

@@ -1,46 +1,61 @@
-<!-- FILEPATH: /c:/Users/krixi/online_shopping/templates/deliveryBoy.html -->
-
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
-    <title>Delivery Boy Dashboard</title>
+    <meta charset="UTF-8">
+    <title>購物車系統</title>
+    <!-- 標題 -->
+    {% if error|length != 0 %}
+        {% for i in error %}
+        <script>
+            var error = "{{i}}"
+            alert(error);
+        </script>
+        {% endfor %}
+    {% endif %}
+
 </head>
 <body>
-    <h1>Delivery Boy Dashboard</h1>
+    <h1>首頁-物流角色 <br/></h1>
+    <!-- 登出按鈕 -->
+    <button type='button' id='log_out'>登出</button>
 
-    <h2>Orders to be Delivered</h2>
-    <table>
-        <thead>
+    <table border="3">
+        <tr>
+            <td colspan="4">收到商家的貨物</td>
+        </tr>
+
+        {% for deliver_order in deliver_orders %}
             <tr>
-                <th>Order ID</th>
-                <th>Customer Name</th>
-                <th>Delivery Address</th>
-                <th>Order Status</th>
-                <th>Action</th>
+                <td><span><b>購物車序號:</b></span>{{ deliver_order.0 }}</td>
+                <td><span><b>訂單狀態:</b></span>{{ deliver_order.4 }}</td>
             </tr>
-        </thead>
-        <tbody>
-            <!-- BEGIN: Loop through orders with order_status="寄送中" -->
-            <tr>
-                <td>Order ID 1</td>
-                <td>Customer Name 1</td>
-                <td>Delivery Address 1</td>
-                <td>寄送中</td>
-                <td>
-                    <button>Select</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Order ID 2</td>
-                <td>Customer Name 2</td>
-                <td>Delivery Address 2</td>
-                <td>寄送中</td>
-                <td>
-                    <button>Select</button>
-                </td>
-            </tr>
-            <!-- END: Loop through orders with order_status="寄送中" -->
-        </tbody>
+        {% endfor %}
     </table>
+
+  
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        <span><b>選擇寄送訂單</b></span>
+        {{ alreadySent.as_p }}
+        <input name='Sent' type="submit"></input>
+    </form>
+
+
+	<style>
+		td { 
+			text-align : center;
+		}
+	</style>
+    <script>
+		function getId(id) {
+			return document.getElementById(id);
+		}
+
+		getId('log_out').addEventListener('click', logOut);
+
+		function logOut() {
+			window.location.href = '/';
+		}
+	</script>
 </body>
 </html>

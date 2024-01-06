@@ -14,7 +14,7 @@
                     {% csrf_token %}
 
                     <div class="form-group">
-                        <label for="name">帳號名稱:</label>
+                        <label for="name">帳號:</label>
                         <input type="text" id="name" name="name" class="form-control">
                     </div>
                     <div class="form-group">
@@ -22,10 +22,11 @@
                         <input type="password" id="pwd" name="pwd" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label for="title">身份:</label>
+                        <label for="title">請選擇要註冊成為什麼角色</label>
                         <select id="title" name="title" class="form-control">
-                            <option value="customer">消費者</option>
+                            <option value="customer">客戶</option>
                             <option value="seller">商家</option>
+                            <option value="deliveryBoy">物流角色</option>
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">送出</button>

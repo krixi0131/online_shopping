@@ -2,13 +2,11 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db import connection
-from .form import login, insertProduct, delProduct, updateProduct, insertCart, delCart, countCart, deliverProduct,confirmOrder
-#from .controller import loginController
+from .form import login, insertProduct, delProduct, updateProduct, insertCart, delCart, countCart, deliverProduct,confirmOrder,alreadySent,getCart
+from .controller import loginController
 import json
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-
-
 
 def loginPage(request) :
     form_login = login(request.POST)
@@ -34,11 +32,39 @@ def loginPage(request) :
                         return redirect('/customerMain') # return to customer page
                     if (all_users[i][2] == 'seller') : # title is seller
                         return redirect('/sellerMain') # return to seller page
-
+                    if (all_users[i][2] == 'deliveryBoy') : # title is seller
+                        return redirect('/deliveryBoy') # return to seller page
             if not correct : # wrong account or pwd 
                 error.append('wrong account or password, login failed')
+ 
     context = {"error" : error, "form_login" : form_login}
     return render(request, 'login.html', context); 
+
+def deliveryBoy(request) : # 運送員主頁面
+    user = request.session.get('user')
+    title = request.session.get('title')
+    if (title == 'deliveryBoy') : # 是管理者
+        error = []
+        cursor = connection.cursor()
+        Sent = alreadySent(request.POST)
+        if request.method == 'POST' :
+            if 'Sent' in request.POST : # 刪除商品
+                cId = request.POST['cId']
+                if 0 == cursor.execute("update cart_shopcart set `order_status` = '已寄送' where `no` = %s ", (cId,)) :
+                    error.append('can not deliver, as no this product Id') # product is none
+                else :
+                    cursor.execute('select `product`, `amount`,`order_status` from cart_shopcart where `no` = %s', (cId,)) # find the stock
+                    cart_product = cursor.fetchone()
+                    cursor.execute('update cart_shopcart set `order_status`="已寄送" where `no` = %s and `user` = %s', (cId, user))
+
+        cursor.execute("select * from cart_shopcart where `order_status` = '寄送中'")
+        deliver_orders = cursor.fetchall()
+
+        context = {'error' : error, 'deliver_orders':deliver_orders,  'user' : user, 'title' : title,  'alreadySent' :Sent}
+        return render(request, 'deliveryBoy.html', context) 
+    else:  
+        return loginPage(request)
+
 
 def sellerMain(request) : # 管理者主頁面
     user = request.session.get('user')
@@ -86,7 +112,7 @@ def sellerMain(request) : # 管理者主頁面
 
             if 'deliver' in request.POST : # 刪除商品
                 cId = request.POST['cId']
-                if 0 == cursor.execute("update cart_shopcart set `order_status` = '已寄送' where `no` = %s and `order_status`='處理中'", (cId,)) :
+                if 0 == cursor.execute("update cart_shopcart set `order_status` = '寄送中' where `no` = %s and `order_status`='處理中'", (cId,)) :
                     error.append('can not deliver, as no this product Id') # product is none
                 else :
                    cursor.execute('select `product`, `amount`,`order_status` from cart_shopcart where `no` = %s', (cId,)) # find the stock
@@ -97,10 +123,6 @@ def sellerMain(request) : # 管理者主頁面
                    cursor.execute('select `stock` from cart_product where `no` = %s', (product,)) # find the stock
                    product_stock = cursor.fetchone()[0] # this product original stock
                    cursor.execute('update cart_shopcart set `order_status`="寄送中" where `no` = %s and `user` = %s', (cId, user))
-
-                   #changed_num = product_stock - amount # original stock - are buy
-                   #cursor.execute('update cart_product set `stock` = %s where `no` = %s', (changed_num, product,))
-                   
 
         cursor.execute("select * from cart_shopcart where `order_status` = '未處理'")
         sell_order_products = cursor.fetchall()
@@ -131,6 +153,7 @@ def customerMain(request) : # 顧客主頁面
         grade = body['grade']
         cpid = body['id']
         cursor.execute('update cart_shopcart set `order_rating` =  %s where `no` = %s', (grade,cpid,))
+
     except Exception as e :
         print(e)
         pass
@@ -140,6 +163,7 @@ def customerMain(request) : # 顧客主頁面
         insert = insertCart(request.POST)
         delete = delCart(request.POST)
         count = countCart(request.POST)
+        getC = getCart(request.POST)
         if request.method == 'POST' : # POST
             if 'insert' in request.POST : # 新增商品
                cursor.execute("select * from cart_product where `stock` > 0") # 還有庫存的商品
@@ -162,16 +186,27 @@ def customerMain(request) : # 顧客主頁面
                if (0 == cursor.execute('delete from cart_shopcart where `no` = %s and `user` = %s', (cId, user,))) : 
                    error.append('can not delete, as no this id in your cart')
             if 'count' in request.POST : # 新增商品
-               #cId = request.POST['cId'] # 商品代號
-               cursor.execute('select `user`,`product`, `amount`, `order_status` from cart_shopcart where `user` = %s and `delivered` = 0 and `paid` = 0', (user,)) # cart product is in cart and be counted
+               cId = request.POST['cId'] # 商品代號
+               cursor.execute('select `user`,`product`, `amount`, `order_status` from cart_shopcart where `user` = %s', (user,)) # cart product is in cart and be counted
                cart_product = cursor.fetchall()
-               #print('1cart_product:', cart_product)
+               order_status = cart_product[0][3]
                if (len(cart_product) == 0) :
                    error.append('can not update, as no product in your cart!')
                else : # count successful
                     cursor.execute('update cart_shopcart set `paid` = 1  where `user` = %s ', (user,)) # set cart product is paid
-                    cursor.execute('update cart_shopcart set `order_status` = "未處理"  where `user` = %s ', (user,))
+                    cursor.execute('update cart_shopcart set `order_status` = "未處理"  where `no` = %s and `user` = %s', (cId, user))
+            if 'getC' in request.POST :
+                cId = request.POST['cId']
+                cursor.execute('select `user`,`product`, `amount`, `order_status` from cart_shopcart where `user` = %s', (user,))
+                cart_product = cursor.fetchall()
+                order_status = cart_product[0][3]
+                if (len(cart_product) == 0) :
+                    error.append('can not update, as no product in your cart!')
+                else :
+                    if (order_status == '已寄送') :
+                        cursor.execute('update cart_shopcart set `order_status` = "已送達"  where `no` = %s and `user` = %s', (cId, user))
 
+            
         cursor.execute("select * from cart_shopcart where `user` = %s ", (user,))
         order_products = cursor.fetchall()     
 
@@ -182,7 +217,7 @@ def customerMain(request) : # 顧客主頁面
         cursor.execute("select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0") # find the reserved products
         reserved_products = cursor.fetchall()
         all_products = takeZero(rmReversed(arrayOf(all_products), reserved_products)) # turn tuple to list
-        context = {'count' : count, 'delete' : delete, 'error' : error, 'user' : user, 'title' : title, 'all_products' : all_products, 'insert' : insert, 'cart_products' : cart_products, 'order_products' : order_products}
+        context = {'count' : count, 'delete' : delete, 'error' : error, 'user' : user, 'title' : title, 'all_products' : all_products, 'insert' : insert, 'cart_products' : cart_products, 'order_products' : order_products,'getCart':getC}
         return render(request, 'customerMain.html', context) 
     else :
         return loginPage(request)

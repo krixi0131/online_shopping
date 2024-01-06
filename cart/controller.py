@@ -19,4 +19,6 @@ def loginController(request) :
                         return redirect('/customerMain')
                     if (all_users[i][2] == 'seller') :
                         return redirect('/sellerMain')
+                    if (all_users[i][2] == 'deliveryBoy') :
+                        return redirect('/deliveryBoy')
     return None
