@@ -82,8 +82,9 @@
             <tr>
                 <td><span><b>購物車序號:</b></span>{{ order_product.0 }}</td>
                 <td><span><b>商品代號：</b></span>{{ order_product.5 }}</td>
-                <td><span><b>購物車狀態:</b></span>{{ order_product.4 }}</td>
-                <td><button id = "evaluate" onclick="eva('{{ order_product.4 }}')">評分</button></td>
+                <td><span><b>訂單狀態:</b></span>{{ order_product.4 }}</td>
+                <td><button id = "evaluate" onclick="eva('{{ order_product.4 }}', '{{ order_product.0 }}')">評分</button></td>
+                <td><span><b>訂單滿意度</b></span>{{ order_product.7 }}</td>
             </tr>
         {% endfor %}
     </table>
@@ -107,10 +108,29 @@
 
     //getId('evaluate').addEventListener('onclick', evaluate);
 
-    function eva(status) {
+    async function eva(status, id) {
         if (status == "已寄送"){
-            let grade = prompt("請填入評價滿意度(1-5顆星)");
-            //顯示評價在table
+            let grade = prompt("請填入評價滿意度(1~5)");
+            //如果grade不是1~5的數字
+            if (grade < 1 || grade > 5 || isNaN(grade)){
+                alert("請填入1~5的數字");
+            }
+            else{
+                let data = {
+                    "grade": grade,
+                    "id" : id
+                }
+                const rawResponse = await fetch('http://127.0.0.1:8000/customerMain', {
+                    method: 'POST',
+                    headers : {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                const content = await rawResponse;
+
+                console.log(content);
+            }
             
         }
     }

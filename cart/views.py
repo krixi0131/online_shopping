@@ -6,6 +6,8 @@ from .form import login, insertProduct, delProduct, updateProduct, insertCart, d
 #from .controller import loginController
 import json
 from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 def loginPage(request) :
@@ -32,6 +34,7 @@ def loginPage(request) :
                         return redirect('/customerMain') # return to customer page
                     if (all_users[i][2] == 'seller') : # title is seller
                         return redirect('/sellerMain') # return to seller page
+
             if not correct : # wrong account or pwd 
                 error.append('wrong account or password, login failed')
     context = {"error" : error, "form_login" : form_login}
@@ -115,14 +118,25 @@ def sellerMain(request) : # 管理者主頁面
     else :  
         return loginPage(request)
     
+@csrf_exempt
 def customerMain(request) : # 顧客主頁面
     user = request.session.get('user')
-    print('user:', user)  # Debug print statement
+    #print('user:', user)  # Debug print statement
     title = request.session.get('title')
-    print('title:', title)  # Debug print statement
+    #print('title:', title)  # Debug print statement
+    body = request.body
+    cursor = connection.cursor()
+    try :
+        body = json.loads(body.decode('utf-8'))
+        grade = body['grade']
+        cpid = body['id']
+        cursor.execute('update cart_shopcart set `order_rating` =  %s where `no` = %s', (grade,cpid,))
+    except Exception as e :
+        print(e)
+        pass
+
     if (title == 'customer') : # 是顧客
         error = [] # return error, and alert
-        cursor = connection.cursor()
         insert = insertCart(request.POST)
         delete = delCart(request.POST)
         count = countCart(request.POST)
@@ -157,7 +171,7 @@ def customerMain(request) : # 顧客主頁面
                else : # count successful
                     cursor.execute('update cart_shopcart set `paid` = 1  where `user` = %s ', (user,)) # set cart product is paid
                     cursor.execute('update cart_shopcart set `order_status` = "未處理"  where `user` = %s ', (user,))
-                    
+
         cursor.execute("select * from cart_shopcart where `user` = %s ", (user,))
         order_products = cursor.fetchall()     
 

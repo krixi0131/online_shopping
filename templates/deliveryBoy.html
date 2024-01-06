@@ -1,0 +1,46 @@
+<!-- FILEPATH: /c:/Users/krixi/online_shopping/templates/deliveryBoy.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Boy Dashboard</title>
+</head>
+<body>
+    <h1>Delivery Boy Dashboard</h1>
+
+    <h2>Orders to be Delivered</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Delivery Address</th>
+                <th>Order Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BEGIN: Loop through orders with order_status="寄送中" -->
+            <tr>
+                <td>Order ID 1</td>
+                <td>Customer Name 1</td>
+                <td>Delivery Address 1</td>
+                <td>寄送中</td>
+                <td>
+                    <button>Select</button>
+                </td>
+            </tr>
+            <tr>
+                <td>Order ID 2</td>
+                <td>Customer Name 2</td>
+                <td>Delivery Address 2</td>
+                <td>寄送中</td>
+                <td>
+                    <button>Select</button>
+                </td>
+            </tr>
+            <!-- END: Loop through orders with order_status="寄送中" -->
+        </tbody>
+    </table>
+</body>
+</html>
