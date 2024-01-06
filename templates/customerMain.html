@@ -83,6 +83,7 @@
                 <td><span><b>購物車序號:</b></span>{{ order_product.0 }}</td>
                 <td><span><b>商品代號：</b></span>{{ order_product.5 }}</td>
                 <td><span><b>購物車狀態:</b></span>{{ order_product.4 }}</td>
+                <td><button id = "evaluate" onclick="eva('{{ order_product.4 }}')">評分</button></td>
             </tr>
         {% endfor %}
     </table>
@@ -93,6 +94,7 @@
         return document.getElementById(id);
     }
 
+
     getId('log_out').addEventListener('click', logOut);
     
 
@@ -102,5 +104,15 @@
     
     getId("id_product").value = ""
     getId("id_amount").value = ""
+
+    //getId('evaluate').addEventListener('onclick', evaluate);
+
+    function eva(status) {
+        if (status == "已寄送"){
+            let grade = prompt("請填入評價滿意度(1-5顆星)");
+            //顯示評價在table
+            
+        }
+    }
 </script>
 </html>
