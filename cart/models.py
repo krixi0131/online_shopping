@@ -27,3 +27,5 @@ class shopCart(models.Model):
     paid = models.BooleanField(default=True)  # 已付款
     delivered = models.BooleanField(default=False, blank=True, null=True)  # 已被購買
     order_status = models.CharField(max_length=10, choices=ORDER_STATUS_CHOICES, default='未處理')  # 訂單狀態
+    order_rating = models.IntegerField(blank=True, null=True) # 訂單評價5分制，評價滿意度(1-5顆星)
+
