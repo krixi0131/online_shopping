@@ -57,7 +57,7 @@ def deliveryBoy(request):  # 物流人員主頁面
     title = request.session.get("title") # get the title
     if title == "deliveryBoy":  # 是物流人員
         error = []
-        cursor = connection.cursor() # 連接資料庫
+        cursor = connection.cursor() # # 連接資料庫
         Sent = alreadySent(request.POST) # 從前端取得已寄送的訂單
         if request.method == "POST":
             if "Sent" in request.POST:  # 物流收到商家的貨物並選擇寄送
@@ -116,11 +116,12 @@ def sellerMain(request):  # 商家主頁面
                 price = request.POST["price"] # 商品價格
                 amount = request.POST["amount"] # 商品數量
                 cursor.execute(
-                    "insert into cart_product(`name`, `price`, `stock`) values(%s, %s, %s)",
+                    "insert into cart_product(`name`, `price`, `stock`, `user`) values(%s, %s, %s, %s)",
                     (
                         name,
                         price,
                         amount,
+                        user,
                     ),# 將商品資訊新增到資料庫
                 )
             if "del" in request.POST:  # 刪除商品
@@ -204,17 +205,20 @@ def sellerMain(request):  # 商家主頁面
                         (cId, user), # 將訂單狀態更新成"寄送中"
                     ) # 將訂單狀態更新到資料庫
 
-        cursor.execute("select * from cart_shopcart where `order_status` = '未處理'") # select 出所有訂單狀態為"未處理"的訂單
+        # select 出所有訂單狀態為"未處理"的訂單
+        cursor.execute("SELECT * FROM cart_shopcart JOIN cart_product ON cart_shopcart.product = cart_product.no WHERE cart_shopcart.order_status = '未處理' AND cart_product.user = '%s';",(user,))
         sell_order_products = cursor.fetchall() # 取得所有訂單狀態為"未處理"的訂單
 
-        cursor.execute("select * from cart_shopcart where `order_status` = '處理中'") # select 出所有訂單狀態為"處理中"的訂單
+        # select 出所有訂單狀態為"處理中"的訂單
+        cursor.execute("SELECT * FROM cart_shopcart JOIN cart_product ON cart_shopcart.product = cart_product.no WHERE cart_shopcart.order_status = '處理中' AND cart_product.user = '%s';",(user,))
         sell_deliver_products = cursor.fetchall() # 取得所有訂單狀態為"處理中"的訂單
 
-        cursor.execute("select * from cart_product") # select 出所有商品
+        # select 出所有商品
+        cursor.execute("SELECT * FROM  cart_product  WHERE cart_product.user = '%s';",(user,))
         all_products = cursor.fetchall() # 取得所有商品
 
         cursor.execute(
-            "select * from cart_shopcart where `paid` = 1 and `delivered` = 0;"
+            "select * from cart_shopcart JOIN cart_product ON cart_shopcart.product = cart_product.no where cart_shopcart.paid = 1 AND cart_shopcart.delivered = 0 AND cart_product.user = %s",(user,)
         )  # 該使用者還沒刪除的購物車商品
         cart_products = cursor.fetchall() # 取得該使用者還沒刪除的購物車商品
         context = {
@@ -271,7 +275,7 @@ def customerMain(request):  # 客戶主頁面
                 )  # 還有庫存的商品
                 all_products = cursor.fetchall() # 取得所有還有庫存的商品
                 cursor.execute(
-                    "select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0"
+                    "select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0 and `user` = %s",(user,)
                 )  # 找出已經被下單的商品
                 reserved_products = cursor.fetchall() # 取得所有已經被下單的商品
                 all_products = takeZero(
@@ -337,9 +341,9 @@ def customerMain(request):  # 客戶主頁面
                     error.append("can not update, as no product in your cart!")
                 else:
                     cursor.execute(
-                        'update cart_shopcart set `order_status` = "已送達"  where `no` = %s and `user` = %s and `order_status` = "已寄送"',
-                        (cId, user), # 訂單狀態更新為"未處理"
-                    )  # 將訂單狀態更新到資料庫
+                        'update cart_shopcart set `order_status` = "已送達"  where `no` = %s and `user` = %s',
+                        (cId, user), # 訂單狀態更新為"已送達"
+                    ) # 將訂單狀態更新到資料庫
 
         cursor.execute("select * from cart_shopcart where `user` = %s ", (user,)) # 找出該使用者的所有訂單
         order_products = cursor.fetchall() # 取得該使用者的所有訂單

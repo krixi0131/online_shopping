@@ -11,10 +11,10 @@ class User(models.Model): # 使用者
 
 class Product(models.Model): # 商品
     no = models.AutoField(primary_key=True)
+    user = models.IntegerField(blank=True, null=True)
     name = models.CharField(max_length=15, blank=True, null=True)  # 商品名稱
     price = models.IntegerField(blank=True, null=True)  # 密碼
     stock = models.IntegerField(blank=True, null=True)  # 商品庫存量
-
 
 class shopCart(models.Model): # 購物車
     ORDER_STATUS_CHOICES = [
