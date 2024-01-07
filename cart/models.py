@@ -11,6 +11,7 @@ class User(models.Model): # 使用者
 
 class Product(models.Model): # 商品
     no = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=15, blank=True, null=True)  # 商品名稱
     price = models.IntegerField(blank=True, null=True)  # 密碼
     stock = models.IntegerField(blank=True, null=True)  # 商品庫存量
