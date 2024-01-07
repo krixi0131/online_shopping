@@ -57,7 +57,7 @@ def deliveryBoy(request):  # 物流人員主頁面
     title = request.session.get("title") # get the title
     if title == "deliveryBoy":  # 是物流人員
         error = []
-        cursor = connection.cursor() # # 連接資料庫
+        cursor = connection.cursor() # 連接資料庫
         Sent = alreadySent(request.POST) # 從前端取得已寄送的訂單
         if request.method == "POST":
             if "Sent" in request.POST:  # 物流收到商家的貨物並選擇寄送
@@ -336,11 +336,10 @@ def customerMain(request):  # 客戶主頁面
                 if len(cart_product) == 0: # 該使用者沒有訂單
                     error.append("can not update, as no product in your cart!")
                 else:
-                    if order_status == "已寄送":
-                        cursor.execute(
-                            'update cart_shopcart set `order_status` = "已送達"  where `no` = %s and `user` = %s',
-                            (cId, user), # 訂單狀態更新為"已送達"
-                        ) # 將訂單狀態更新到資料庫
+                    cursor.execute(
+                        'update cart_shopcart set `order_status` = "已送達"  where `no` = %s and `user` = %s and `order_status` = "已寄送"',
+                        (cId, user), # 訂單狀態更新為"未處理"
+                    )  # 將訂單狀態更新到資料庫
 
         cursor.execute("select * from cart_shopcart where `user` = %s ", (user,)) # 找出該使用者的所有訂單
         order_products = cursor.fetchall() # 取得該使用者的所有訂單
