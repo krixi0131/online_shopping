@@ -213,7 +213,8 @@ def sellerMain(request):  # 商家主頁面
         cursor.execute("SELECT * FROM cart_shopcart JOIN cart_product ON cart_shopcart.product = cart_product.no WHERE cart_shopcart.order_status = '處理中' AND cart_product.user = '%s';",(user,))
         sell_deliver_products = cursor.fetchall() # 取得所有訂單狀態為"處理中"的訂單
 
-        cursor.execute("select * from cart_product") # select 出所有商品
+        # select 出所有商品
+        cursor.execute("SELECT * FROM cart_shopcart JOIN cart_product ON cart_shopcart.product = cart_product.no WHERE cart_product.user = '%s';",(user,))
         all_products = cursor.fetchall() # 取得所有商品
 
         cursor.execute(
