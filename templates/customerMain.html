@@ -126,6 +126,7 @@
             //如果grade不是1~5的數字
             if (grade < 1 || grade > 5 || isNaN(grade)){
                 alert("請填入1~5的數字");
+                return;
             }
             else{
                 let data = {
@@ -141,6 +142,7 @@
                 });
                 const content = await rawResponse;
             }
+            window.location.reload();
             
         }
     }
