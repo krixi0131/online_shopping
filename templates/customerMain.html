@@ -1,67 +1,64 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>購物車系統</title>
-    <!-- JavaScript 中的錯誤處理 -->
+    <!-- 錯誤處理 -->
     {% if error|length != 0 %}
-        {% for i in error %}
-        <script>
-            var error = "{{i}}"
-            alert(error);
-        </script>
-        {% endfor %}
+    {% for i in error %}
+    <script>
+        var error = "{{i}}"
+        alert(error);
+    </script>
+    {% endfor %}
     {% endif %}
 </head>
+
 <body>
-    <!-- 標題 -->
-    <h1>首頁-客戶<br/></h1>
+    <h1>首頁-客戶<br /></h1>
     <!-- 登出按鈕 -->
     <button type='button' id='log_out' class='btn btn-primary'>登出</button>
-    
-    <!-- 尚有庫存之貨品清單 -->
     <div>尚有庫存之貨品清單</div>
-    
     <!-- 商品清單表格 -->
     <table border="2">
         {% for product in all_products %}
-            <tr>
-                <td><span><b>商品代號：</b></span>{{ product.0 }}</td>
-                <td><span><b>商品名稱：</b></span>{{ product.1 }}</td>
-                <td><span><b>商品價格：</b></span>{{ product.2 }}</td>
-                <td><span><b>商品數量：</b></span>{{ product.3 }}</td>
-            </tr>
+        <tr>
+            <td><span><b>商品代號：</b></span>{{ product.0 }}</td>
+            <td><span><b>商品名稱：</b></span>{{ product.1 }}</td>
+            <td><span><b>商品價格：</b></span>{{ product.2 }}</td>
+            <td><span><b>商品數量：</b></span>{{ product.3 }}</td>
+        </tr>
         {% endfor %}
     </table>
-    
-    <!-- 購物車 -->
+
     <div>購物車</div>
     <!-- 購物車表格 -->
     <table border="2">
         {% for cart_product in cart_products %}
-            <tr>
-                <td><span><b>購物車序號:</b></span>{{ cart_product.0 }}</td>
-                <td><span><b>商品代號：</b></span>{{ cart_product.5 }}</td>
-                <td><span><b>商品數量：</b></span>{{ cart_product.1 }}</td>
-                {% for product in all_products %}
-                    {% if product.0 == cart_product.5 %}
-                        <td><span><b>單價:</b></span>{{ product.2 }}</td>
-                        <td><span><b>總價:</b></span>{% widthratio product.2 1 cart_product.1 %}</td>
-                    {% endif %}
-                {% endfor %}
-            </tr>
+        <tr>
+            <td><span><b>購物車序號:</b></span>{{ cart_product.0 }}</td>
+            <td><span><b>商品代號：</b></span>{{ cart_product.5 }}</td>
+            <td><span><b>商品數量：</b></span>{{ cart_product.1 }}</td>
+            {% for product in all_products %}
+            {% if product.0 == cart_product.5 %}
+            <td><span><b>單價:</b></span>{{ product.2 }}</td>
+            <td><span><b>總價:</b></span>{% widthratio product.2 1 cart_product.1 %}</td> <!-- 單價*數量 -->
+            {% endif %}
+            {% endfor %}
+        </tr>
         {% endfor %}
     </table>
-    
+
     <!-- 新增至購物車表單 -->
-    <form enctype="multipart/form-data" method="post" id = "insert_from">
+    <form enctype="multipart/form-data" method="post" id="insert_from">
         {% csrf_token %}
-        <span>商品新增至購物車</span>
-        {{ insert.as_p }}
-        <input name='insert' type="submit"></input>
+        <span>商品新增至購物車</span> 
+        {{ insert.as_p }} 
+        <input name='insert' type="submit"></input> <!-- 新增至購物車按鈕 -->
     </form>
-    <br/>
-    
+    <br />
+
     <!-- 刪除購物車表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
@@ -78,16 +75,16 @@
         <input name='count' type="submit"></input>
     </form>
 
-    
+
     <table border="3">
         {% for order_product in order_products %}
-            <tr>
-                <td><span><b>購物車序號:</b></span>{{ order_product.0 }}</td>
-                <td><span><b>商品代號：</b></span>{{ order_product.5 }}</td>
-                <td><span><b>訂單狀態:</b></span>{{ order_product.4 }}</td>
-                <td><button id = "evaluate" onclick="eva('{{ order_product.4 }}', '{{ order_product.0 }}')">評分</button></td>
-                <td><span><b>訂單滿意度</b></span>{{ order_product.7 }}</td>
-            </tr>
+        <tr>
+            <td><span><b>購物車序號:</b></span>{{ order_product.0 }}</td>
+            <td><span><b>商品代號：</b></span>{{ order_product.5 }}</td>
+            <td><span><b>訂單狀態:</b></span>{{ order_product.4 }}</td>
+            <td><button id="evaluate" onclick="eva('{{ order_product.4 }}', '{{ order_product.0 }}')">評分</button></td> <!-- 評分按鈕 -->
+            <td><span><b>訂單滿意度</b></span>{{ order_product.7 }}</td>
+        </tr>
         {% endfor %}
     </table>
 
@@ -105,46 +102,44 @@
 <script>
     function getId(id) {
         return document.getElementById(id);
-    }
+    } //取得id
 
-
-    getId('log_out').addEventListener('click', logOut);
-    
+    getId('log_out').addEventListener('click', logOut); //登出按鈕
 
     function logOut() {
         window.location.href = '/';
-    }
-    
-    getId("id_product").value = ""
-    getId("id_amount").value = ""
+    } //登出
 
-    //getId('evaluate').addEventListener('onclick', evaluate);
+    //getId('insert').addEventListener('click', insert); //新增至購物車按鈕
+    getId("id_product").value = "" //清空新增至購物車表單
+    getId("id_amount").value = ""  //清空新增至購物車表單
 
-    async function eva(status, id) {
-        if (status == "已送達"){
+    async function eva(status, id) { //評分按鈕
+        if (status == "已送達") {
             let grade = prompt("請填入評價滿意度(1~5)");
             //如果grade不是1~5的數字
-            if (grade < 1 || grade > 5 || isNaN(grade)){
+            if (grade < 1 || grade > 5 || isNaN(grade)) { 
                 alert("請填入1~5的數字");
                 return;
             }
-            else{
+            else {
                 let data = {
                     "grade": grade,
-                    "id" : id
+                    "id": id
                 }
                 const rawResponse = await fetch('http://127.0.0.1:8000/customerMain', {
                     method: 'POST',
-                    headers : {
-                        'Content-Type': 'application/json'
+                    headers: {
+                        'Content-Type': 'application/json' 
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data) 
                 });
-                const content = await rawResponse;
+                const content = await rawResponse; //取得回傳值
             }
-            window.location.reload();
-            
+            window.location.reload(); //重新整理
+
         }
     }
 </script>
+
 </html>

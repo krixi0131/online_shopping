@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>線上購物系統 - 登入</title>
@@ -11,6 +12,7 @@
         }
     </style>
 
+    <!-- 錯誤處理 -->
     {% if error|length != 0 %}
     {% for i in error %}
     <div class="row">
@@ -21,9 +23,10 @@
         </div>
     </div>
     {% endfor %}
-{% endif %}
+    {% endif %}
 
 </head>
+
 <body>
     <div class="container">
         <div class="row">
@@ -32,14 +35,16 @@
             </div>
         </div>
 
-    <h2> < DEMO 帳號 > </h2>
-    
-    <p><b>商家帳號: seller，密碼: 123</b></p>
-    <p><b>客戶帳號: cus，密碼: 123</b></p>
-    <p><b>物流帳號: uber，密碼: 123</b></p>
-    {% if error %}
+        <h2>
+            < DEMO 帳號>
+        </h2>
+
+        <p><b>商家帳號: seller，密碼: 123</b></p>
+        <p><b>客戶帳號: cus，密碼: 123</b></p>
+        <p><b>物流帳號: uber，密碼: 123</b></p>
+        {% if error %}
         <script>
-            // 檢查 error_json 是否為有效的JSON格式
+            // 將錯誤訊息轉換為 JSON 格式
             var error_json = '{{ error_json | escapejs | safe}}'; // 使用 safe 過濾器
             if (error_json.trim().length > 0) {
                 try {
@@ -50,27 +55,27 @@
                 }
             }
         </script>
-    {% endif %}
+        {% endif %}
 
-
-    <div class="row justify-content-center mt-5">
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0">登入</h3>
-                </div>
-                <div class="card-body">
-    <form enctype="multipart/form-data" method="post">
-        {% csrf_token %}
-        {{ form_login.as_p }}
-        <input type="submit" value="登入"></input>
-        <button onclick="location.href='register/'">註冊</button>
-    </form>
+        <div class="row justify-content-center mt-5">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">登入</h3>
+                    </div>
+                    <div class="card-body">
+                        <form enctype="multipart/form-data" method="post">
+                            {% csrf_token %}
+                            {{ form_login.as_p }}
+                            <input type="submit" value="登入"></input>
+                            <button onclick="location.href='register/'">註冊</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
     </div>
 </body>
+
 </html>

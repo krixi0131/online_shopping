@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>購物車系統</title>
-    <!-- 標題 -->
+    <!-- 錯誤處理 -->
     {% if error|length != 0 %}
-        {% for i in error %}
-        <script>
-            var error = "{{i}}"
-            alert(error);
-        </script>
-        {% endfor %}
+    {% for i in error %}
+    <script>
+        var error = "{{i}}"
+        alert(error);
+    </script>
+    {% endfor %}
     {% endif %}
 
 </head>
+
 <body>
-    <h1>首頁-物流角色 <br/></h1>
+    <h1>首頁-物流角色 <br /></h1>
     <!-- 登出按鈕 -->
     <button type='button' id='log_out'>登出</button>
 
@@ -24,38 +26,39 @@
             <td colspan="4">收到商家的貨物</td>
         </tr>
 
-        {% for deliver_order in deliver_orders %}
-            <tr>
-                <td><span><b>購物車序號:</b></span>{{ deliver_order.0 }}</td>
-                <td><span><b>訂單狀態:</b></span>{{ deliver_order.4 }}</td>
-            </tr>
+        {% for deliver_order in deliver_orders %} <!-- 顯示所有訂單 -->
+        <tr>
+            <td><span><b>購物車序號:</b></span>{{ deliver_order.0 }}</td>
+            <td><span><b>訂單狀態:</b></span>{{ deliver_order.4 }}</td>
+        </tr>
         {% endfor %}
     </table>
 
-  
+
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span><b>選擇寄送訂單</b></span>
         {{ alreadySent.as_p }}
-        <input name='Sent' type="submit"></input>
+        <input name='Sent' type="submit"></input> <!-- 新增至購物車按鈕 -->
     </form>
 
 
-	<style>
-		td { 
-			text-align : center;
-		}
-	</style>
+    <style>
+        td {
+            text-align: center;
+        }
+    </style>
     <script>
-		function getId(id) {
-			return document.getElementById(id);
-		}
+        function getId(id) {
+            return document.getElementById(id);
+        } 
 
-		getId('log_out').addEventListener('click', logOut);
+        getId('log_out').addEventListener('click', logOut); // 登出按鈕
 
-		function logOut() {
-			window.location.href = '/';
-		}
-	</script>
+        function logOut() {
+            window.location.href = '/'; // 跳轉至登入頁面
+        } 
+    </script>
 </body>
+
 </html>

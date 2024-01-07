@@ -1,74 +1,76 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
     <meta charset="UTF-8">
     <title>購物車系統</title>
-    <!-- 標題 -->
+    <!-- 錯誤處理 -->
     {% if error|length != 0 %}
-        {% for i in error %}
-        <script>
-            var error = "{{i}}"
-            alert(error);
-        </script>
-        {% endfor %}
+    {% for i in error %}
+    <script>
+        var error = "{{i}}"
+        alert(error);
+    </script>
+    {% endfor %}
     {% endif %}
 
 </head>
+
 <body>
-    <h1>首頁-商家 <br/></h1>
+    <h1>首頁-商家 <br /></h1>
     <!-- 登出按鈕 -->
     <button type='button' id='log_out'>登出</button>
-    
+
     <!-- 全部商品清單 -->
     <table border="2">
         <tr>
             <td colspan="4">全部商品清單</td>
         </tr>
 
-    {% for product in all_products %}
+        {% for product in all_products %}
         <tr>
             <td><span><b>商品代號： </b></span>{{ product.0 }}</td>
             <td><span><b>商品名稱： </b></span>{{ product.1 }}</td>
             <td><span><b>商品價格： </b></span>{{ product.2 }}</td>
             <td><span><b>商品數量： </b></span>{{ product.3 }}</td>
         </tr>
-    {% endfor %}
+        {% endfor %}
     </table>
-    
+
     <!-- 新增商品表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span><b>新增</b></span>
-        {{ insertProduct.as_p }}
-        <input name='insert' type="submit"></input>
+        {{ insertProduct.as_p }} <!-- 顯示表單 -->
+        <input name='insert' type="submit"></input> <!-- 新增按鈕 -->
     </form>
-    
+
     <!-- 刪除商品表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span><b>刪除</b></span>
-        {{ delProduct.as_p }}
-        <input name='del' type="submit"></input>
+        {{ delProduct.as_p }} <!-- 顯示表單 -->
+        <input name='del' type="submit"></input> <!-- 刪除按鈕 -->
     </form>
-    
+
     <!-- 更新商品表單 -->
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span><b>更新商品</b></span>
-        {{ updateProduct.as_p }}
-        <input name='update' type="submit"></input>
+        {{ updateProduct.as_p }} <!-- 顯示表單 -->
+        <input name='update' type="submit"></input> <!-- 更新按鈕 -->
     </form>
-    <br/>
+    <br />
 
     <table border="3">
         <tr>
             <td colspan="4">客戶已下訂的訂單</td>
         </tr>
-        {% for sell_order_product in sell_order_products %}
-            <tr>
-                <td><span><b>購物車序號:</b></span>{{ sell_order_product.0 }}</td>
-                <td><span><b>訂單狀態:</b></span>{{ sell_order_product.4 }}</td>
-            </tr>
+        {% for sell_order_product in sell_order_products %} <!-- 顯示所有訂單 -->
+        <tr>
+            <td><span><b>購物車序號:</b></span>{{ sell_order_product.0 }}</td>
+            <td><span><b>訂單狀態:</b></span>{{ sell_order_product.4 }}</td>
+        </tr>
         {% endfor %}
     </table>
 
@@ -76,8 +78,8 @@
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span><b>收到的訂單 進行確認</b></span>
-        {{ confirmOrder.as_p }}
-        <input name='confirm' type="submit"></input>
+        {{ confirmOrder.as_p }} <!-- 顯示表單 -->
+        <input name='confirm' type="submit"></input> <!--商家確認訂單按鈕(成為處理中訂單) -->
     </form>
 
     <table border="3">
@@ -85,10 +87,10 @@
             <td colspan="4">已確認過 等待出貨的訂單</td>
         </tr>
         {% for sell_deliver_product in sell_deliver_products %}
-            <tr>
-                <td><span><b>購物車序號:</b></span>{{ sell_deliver_product.0 }}</td>
-                <td><span><b>訂單狀態:</b></span>{{ sell_deliver_product.4 }}</td>
-            </tr>
+        <tr>
+            <td><span><b>購物車序號:</b></span>{{ sell_deliver_product.0 }}</td>
+            <td><span><b>訂單狀態:</b></span>{{ sell_deliver_product.4 }}</td>
+        </tr>
         {% endfor %}
     </table>
 
@@ -96,26 +98,27 @@
     <form enctype="multipart/form-data" method="post">
         {% csrf_token %}
         <span><b>要包裝出貨的訂單</b></span>
-        {{ deliverProduct.as_p }}
-        <input name='deliver' type="submit"></input>
+        {{ deliverProduct.as_p }} <!-- 顯示表單 -->
+        <input name='deliver' type="submit"></input> <!-- 寄出商品按鈕(包裝出貨，成為寄送中訂單) -->
     </form>
 
 
-	<style>
-		td { 
-			text-align : center;
-		}
-	</style>
+    <style>
+        td {
+            text-align: center;
+        }
+    </style>
     <script>
-		function getId(id) {
-			return document.getElementById(id);
-		}
+        function getId(id) {
+            return document.getElementById(id);
+        }
 
-		getId('log_out').addEventListener('click', logOut);
+        getId('log_out').addEventListener('click', logOut); // 登出按鈕
 
-		function logOut() {
-			window.location.href = '/';
-		}
-	</script>
+        function logOut() {
+            window.location.href = '/'; // 跳轉至登入頁面
+        }
+    </script>
 </body>
+
 </html>
