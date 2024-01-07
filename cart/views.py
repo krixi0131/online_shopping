@@ -150,7 +150,7 @@ def sellerMain(request):  # 商家主頁面
                     (cId,),
                 ):  # 更新訂單狀態為"處理中"
                     error.append(
-                        "can not confirm, as no this product Id"
+                        "不能確認不存在的訂單"
                     )  # product is none
                 else:
                     cursor.execute(
@@ -287,7 +287,7 @@ def customerMain(request):  # 客戶主頁面
                     all_products, product
                 )  # 找出該商品的庫存
                 if product_stock == None: # 沒有該商品
-                    error.append("insert failed, as the cart_product Id is null")
+                    error.append("無法新增不存在的商品")
                 else:
                     if product_stock >= int(amount):  # stock的數量大於等於amount
                         cursor.execute(
@@ -299,7 +299,7 @@ def customerMain(request):  # 客戶主頁面
                             ), # 將商品資訊新增到資料庫
                         )
                     else:
-                        error.append("stock is not sufficient")
+                        error.append("該商品的庫存小於您想購買的數量!")
             if "delete" in request.POST:  # 刪除商品
                 cId = request.POST["cId"]  # 商品代號
                 if 0 == cursor.execute(
@@ -309,7 +309,7 @@ def customerMain(request):  # 客戶主頁面
                         user,
                     ), # 將商品資訊從資料庫刪除
                 ):
-                    error.append("can not delete, as no this id in your cart")
+                    error.append("無法刪除不存在的商品")
             if "count" in request.POST:  # 接受訂單
                 cId = request.POST["cId"]  # 商品代號
                 cursor.execute(
@@ -345,11 +345,11 @@ def customerMain(request):  # 客戶主頁面
                         (cId, user), # 訂單狀態更新為"已送達"
                     ) # 將訂單狀態更新到資料庫
 
-        cursor.execute("select * from cart_shopcart where `user` = %s ", (user,)) # 找出該使用者的所有訂單
+        cursor.execute("select * from cart_shopcart where `user` = %s and `order_status`!='' ", (user,)) # 找出該使用者的所有訂單
         order_products = cursor.fetchall() # 取得該使用者的所有訂單
 
         cursor.execute(
-            "select * from cart_shopcart where `user` = %s and `paid` = 0", (user,)
+            "select * from cart_shopcart where `user` = %s and `order_status`='' ", (user,)
         )  # select 出該使用者的購物車商品
         cart_products = cursor.fetchall() # 取得該使用者的購物車商品
         cursor.execute("select * from cart_product where `stock` > 0")  # select 出所有還有庫存的商品
