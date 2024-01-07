@@ -154,26 +154,6 @@ def sellerMain(request):  # 商家主頁面
                     )  # product is none
                 else:
                     cursor.execute(
-                        "select `product`, `amount`,`order_status` from cart_shopcart where `no` = %s",
-                        (cId,),
-                    )  # select 出該訂單的商品代號、數量、訂單狀態
-                    cart_product = cursor.fetchone() # 取得該訂單的商品代號、數量、訂單狀態
-                    product = cart_product[0]  # the product Id of cart product
-                    amount = cart_product[1]  # the amount of cart product
-                    order_status = cart_product[2] # the order status of cart product
-                    cursor.execute(
-                        "select `stock` from cart_product where `no` = %s", (product,)
-                    )  # select 出該商品的庫存
-                    product_stock = cursor.fetchone()[0]  # 此商品的原始庫存
-                    changed_num = product_stock - amount  # 更新後的庫存
-                    cursor.execute(
-                        "update cart_product set `stock` = %s where `no` = %s",
-                        (
-                            changed_num,
-                            product,
-                        ), # 將商品庫存更新到資料庫
-                    )
-                    cursor.execute(
                         'update cart_shopcart set `order_status`="處理中" where `no` = %s and `user` = %s',
                         (cId, user),
                     ) # 將訂單狀態更新到資料庫
@@ -278,9 +258,9 @@ def customerMain(request):  # 客戶主頁面
                     "select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0 and `user` = %s",(user,)
                 )  # 找出已經被下單的商品
                 reserved_products = cursor.fetchall() # 取得所有已經被下單的商品
-                all_products = takeZero(
-                    rmReversed(arrayOf(all_products), reserved_products)
-                )  # 轉換tuple為list
+                #all_products = takeZero(
+                #    rmReversed(arrayOf(all_products), reserved_products)
+                #)  # 轉換tuple為list
                 product = request.POST["product"]  # 商品代號
                 amount = request.POST["amount"]  # 商品數量
                 product_stock = findProduct(
@@ -329,6 +309,28 @@ def customerMain(request):  # 客戶主頁面
                         'update cart_shopcart set `order_status` = "未處理"  where `no` = %s and `user` = %s',
                         (cId, user), # 訂單狀態更新為"未處理"
                     )  # 將訂單狀態更新到資料庫
+
+                    cursor.execute(
+                        "select `product`, `amount`,`order_status` from cart_shopcart where `no` = %s",
+                        (cId,),
+                    )  # select 出該訂單的商品代號、數量、訂單狀態
+                    cart_product = cursor.fetchone() # 取得該訂單的商品代號、數量、訂單狀態
+                    product = cart_product[0]  # the product Id of cart product
+                    amount = cart_product[1]  # the amount of cart product
+                    order_status = cart_product[2] # the order status of cart product
+                    cursor.execute(
+                        "select `stock` from cart_product where `no` = %s", (product,)
+                    )  # select 出該商品的庫存
+                    product_stock = cursor.fetchone()[0]  # 此商品的原始庫存
+                    changed_num = product_stock - amount  # 更新後的庫存
+                    cursor.execute(
+                        "update cart_product set `stock` = %s where `no` = %s",
+                        (
+                            changed_num,
+                            product,
+                        ), # 將商品庫存更新到資料庫
+                    )
+                    
             if "getC" in request.POST: # 取得購物車
                 cId = request.POST["cId"] # 訂單代號
                 cursor.execute(
@@ -358,9 +360,9 @@ def customerMain(request):  # 客戶主頁面
             "select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0"
         )  # select 出已經被下單的商品
         reserved_products = cursor.fetchall() # 取得所有已經被下單的商品
-        all_products = takeZero(
-            rmReversed(arrayOf(all_products), reserved_products)
-        )  # 轉換tuple為list
+        #all_products = takeZero(
+            #rmReversed(arrayOf(all_products), reserved_products)
+        #)  # 轉換tuple為list
         context = {
             "count": count,
             "delete": delete,

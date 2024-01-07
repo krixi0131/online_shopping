@@ -72,7 +72,7 @@
         {% csrf_token %}
         <span>結算購物車內商品</span>
         {{ count.as_p }}
-        <input name='count' type="submit"></input>
+        <input name='count' type="submit" onclick="check(event)"></input>
     </form>
 
 
@@ -104,6 +104,98 @@
         return document.getElementById(id);
     } //取得id
 
+    function check(event){
+        //alert("fuck")
+        const product = getProduct(); 
+        const cart = getCart();
+        const cid = document.getElementsByName("cId")[1].value
+        const pid = getPid(cart, cid);
+
+        for (let i = 0;i < product.length;i++) {
+            if (product[i][0] == pid[0]) {
+                if (product[i][3] < pid[1]) {
+                    alert("庫存不足");
+                    if (event) event.returnValue = false;
+                    return false;
+                }
+                else {
+                    console.log("庫存足");
+                    return true;
+                }
+            }
+        }
+        if (event) event.returnValue = false;
+        alert("庫存不足喔");
+        return false;
+    }
+
+    function getPid(cart, cid) {
+        for (let i = 0; i < cart.length; i++) {
+            if (cart[i][0] == cid) {
+                return [cart[i][5], cart[i][1]];
+            }
+        }
+        return [0,0];
+    }
+
+    function getProduct() {
+        let string = "{{ all_products }}";
+        // Create a DOMParser
+        const parser = new DOMParser();
+
+        // Parse the string as HTML
+        const parsedString = parser.parseFromString(string, 'text/html');
+
+        // Extract the text content from the parsed HTML
+        let decodedString = parsedString.documentElement.textContent;
+        decodedString.replace("'", '"')
+        string = decodedString.replace(/'/g, '"');
+
+        let tuples = string.replace(/^\(|\)$/g, '').split('), (');
+
+        // Mapping over the tuples and converting each tuple to an array
+        let arrayOfArrays = tuples.map(tuple => {
+            // Splitting each tuple by ', ' and then removing double quotes from strings
+            return tuple.split(', ').map(item => {
+                // Removing double quotes if the item represents a string
+                return isNaN(item) ? item.replace(/"/g, '') : parseFloat(item);
+            });
+        });
+        arrayOfArrays[0][0] = arrayOfArrays[0][0].replace("(", "");
+        arrayOfArrays[arrayOfArrays.length-1][4] = arrayOfArrays[arrayOfArrays.length-1][4].replace(")", "");
+        return arrayOfArrays;
+    }
+
+    function getCart() {
+        let string = "{{ cart_products }}";
+        // Create a DOMParser
+        const parser = new DOMParser();
+
+        // Parse the string as HTML
+        const parsedString = parser.parseFromString(string, 'text/html');
+
+        // Extract the text content from the parsed HTML
+        let decodedString = parsedString.documentElement.textContent;
+        decodedString.replace("'", '"')
+        string = decodedString.replace(/'/g, '"');
+        string = string.replace(/\(/g, '[').replace(/\)/g, ']');
+        string = string.replace(/'/g, '"');
+        string = string.replace(/None/g, '""');
+
+        // Parsing the string as JSON to get an array
+        let array;
+        if (string[string.length-2] == ",") {
+            string = string.slice(0, string.length-2) + string.slice(string.length-1, string.length);
+        }
+        try {
+            array = JSON.parse(string);
+        } catch (error) {
+            console.error("Invalid JSON string:", error);
+        }
+        console.log(array)
+        return array;
+    }
+
     getId('log_out').addEventListener('click', logOut); //登出按鈕
 
     function logOut() {
@@ -111,12 +203,17 @@
     } //登出
 
     //getId('insert').addEventListener('click', insert); //新增至購物車按鈕
-    getId("id_product").value = "" //清空新增至購物車表單
-    getId("id_amount").value = ""  //清空新增至購物車表單
-    getId("id_name").value = "" 
-    getId("id_price").value = "" 
-    getId("id_cId").value = "" 
-    
+    setTimeout(clean,10)
+    function clean() {
+        console.log("clean")
+        getId("id_amount").value = ""  //清空新增至購物車表單
+        getId("id_cId").value = "" 
+        getId("id_product").value = ""
+        document.getElementsByName("cId")[0].value = ""
+        document.getElementsByName("cId")[1].value = ""
+        document.getElementsByName("cId")[2].value = ""
+    }
+
 
     async function eva(status, id) { //評分按鈕
         if (status == "已送達") {
