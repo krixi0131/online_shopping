@@ -16,7 +16,8 @@
 </head>
 
 <body>
-    <h1>首頁-客戶<br /></h1>
+
+    <h1>首頁-客戶 (使用者編號:{{user}}) <br /></h1>
     <!-- 登出按鈕 -->
     <button type='button' id='log_out' class='btn btn-primary'>登出</button>
     <div>尚有庫存之貨品清單</div>
@@ -24,10 +25,10 @@
     <table border="2">
         {% for product in all_products %}
         <tr>
-            <td><span><b>商品代號：</b></span>{{ product.0 }}</td>
-            <td><span><b>商品名稱：</b></span>{{ product.1 }}</td>
-            <td><span><b>商品價格：</b></span>{{ product.2 }}</td>
-            <td><span><b>商品數量：</b></span>{{ product.3 }}</td>
+            <td><span><b>商品代號： </b></span>{{ product.0 }}</td>
+            <td><span><b>商品名稱： </b></span>{{ product.1 }}</td>
+            <td><span><b>商品價格： </b></span>{{ product.2 }}</td>
+            <td><span><b>商品數量： </b></span>{{ product.3 }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -37,13 +38,13 @@
     <table border="2">
         {% for cart_product in cart_products %}
         <tr>
-            <td><span><b>購物車序號:</b></span>{{ cart_product.0 }}</td>
-            <td><span><b>商品代號：</b></span>{{ cart_product.5 }}</td>
-            <td><span><b>商品數量：</b></span>{{ cart_product.1 }}</td>
+            <td><span><b>購物車序號: </b></span>{{ cart_product.0 }}</td>
+            <td><span><b>商品代號： </b></span>{{ cart_product.5 }}</td>
+            <td><span><b>商品數量： </b></span>{{ cart_product.1 }}</td>
             {% for product in all_products %}
             {% if product.0 == cart_product.5 %}
-            <td><span><b>單價:</b></span>{{ product.2 }}</td>
-            <td><span><b>總價:</b></span>{% widthratio product.2 1 cart_product.1 %}</td> <!-- 單價*數量 -->
+            <td><span><b>單價: </b></span>{{ product.2 }}</td>
+            <td><span><b>總價: </b></span>{% widthratio product.2 1 cart_product.1 %}</td> <!-- 單價*數量 -->
             {% endif %}
             {% endfor %}
         </tr>
@@ -79,11 +80,11 @@
     <table border="3">
         {% for order_product in order_products %}
         <tr>
-            <td><span><b>購物車序號:</b></span>{{ order_product.0 }}</td>
-            <td><span><b>商品代號：</b></span>{{ order_product.5 }}</td>
-            <td><span><b>訂單狀態:</b></span>{{ order_product.4 }}</td>
+            <td><span><b>購物車序號: </b></span>{{ order_product.0 }}</td>
+            <td><span><b>商品代號： </b></span>{{ order_product.5 }}</td>
+            <td><span><b>訂單狀態: </b></span>{{ order_product.4 }}</td>
             <td><button id="evaluate" onclick="eva('{{ order_product.4 }}', '{{ order_product.0 }}')">評分</button></td> <!-- 評分按鈕 -->
-            <td><span><b>訂單滿意度</b></span>{{ order_product.7 }}</td>
+            <td><span><b>訂單滿意度: </b></span>{{ order_product.7 }}</td>
         </tr>
         {% endfor %}
     </table>
@@ -105,15 +106,15 @@
     } //取得id
 
     function check(event){
-        //alert("fuck")
-        const product = getProduct(); 
-        const cart = getCart();
-        const cid = document.getElementsByName("cId")[1].value
-        const pid = getPid(cart, cid);
+        const product = getProduct(); //取得商品表
+        const cart = getCart(); //取得購物車表
+        const cid = document.getElementsByName("cId")[1].value //取得要結算的購物車序號
+        const pid = getPid(cart, cid); //取得要結算的商品代號及數量
 
+        
         for (let i = 0;i < product.length;i++) {
-            if (product[i][0] == pid[0]) {
-                if (product[i][3] < pid[1]) {
+            if (product[i][0] == pid[0]) { //找到要結算的商品
+                if (product[i][3] < pid[1]) { //判斷商品的庫存是否足夠
                     alert("庫存不足");
                     if (event) event.returnValue = false;
                     return false;
@@ -131,50 +132,54 @@
 
     function getPid(cart, cid) {
         for (let i = 0; i < cart.length; i++) {
-            if (cart[i][0] == cid) {
-                return [cart[i][5], cart[i][1]];
+            if (cart[i][0] == cid) { //找到要結算的購物車序號
+                return [cart[i][5], cart[i][1]]; //回傳商品代號及數量
             }
         }
         return [0,0];
     }
 
+    //取得商品表
     function getProduct() {
         let string = "{{ all_products }}";
-        // Create a DOMParser
+        // 創建一個 DOMParser
         const parser = new DOMParser();
 
-        // Parse the string as HTML
+        // 將字串解析為 HTML
         const parsedString = parser.parseFromString(string, 'text/html');
 
-        // Extract the text content from the parsed HTML
+        // 從解析後的 HTML 中提取文字內容
         let decodedString = parsedString.documentElement.textContent;
         decodedString.replace("'", '"')
         string = decodedString.replace(/'/g, '"');
 
+        // 將字串解析為 JSON 以取得陣列
         let tuples = string.replace(/^\(|\)$/g, '').split('), (');
 
-        // Mapping over the tuples and converting each tuple to an array
+        // 將陣列中的每個元素轉換為陣列
         let arrayOfArrays = tuples.map(tuple => {
-            // Splitting each tuple by ', ' and then removing double quotes from strings
+            
             return tuple.split(', ').map(item => {
-                // Removing double quotes if the item represents a string
+                // 如果是字串，則移除雙引號
                 return isNaN(item) ? item.replace(/"/g, '') : parseFloat(item);
             });
         });
+
+        // 移除多餘的雙引號
         arrayOfArrays[0][0] = arrayOfArrays[0][0].replace("(", "");
         arrayOfArrays[arrayOfArrays.length-1][4] = arrayOfArrays[arrayOfArrays.length-1][4].replace(")", "");
         return arrayOfArrays;
     }
 
+    //取得購物車表
     function getCart() {
         let string = "{{ cart_products }}";
-        // Create a DOMParser
         const parser = new DOMParser();
 
-        // Parse the string as HTML
+        // 將字串解析為 HTML
         const parsedString = parser.parseFromString(string, 'text/html');
 
-        // Extract the text content from the parsed HTML
+        // 從解析後的 HTML 中提取文字內容
         let decodedString = parsedString.documentElement.textContent;
         decodedString.replace("'", '"')
         string = decodedString.replace(/'/g, '"');
@@ -182,7 +187,7 @@
         string = string.replace(/'/g, '"');
         string = string.replace(/None/g, '""');
 
-        // Parsing the string as JSON to get an array
+        // 將字串解析為 JSON 以取得陣列
         let array;
         if (string[string.length-2] == ",") {
             string = string.slice(0, string.length-2) + string.slice(string.length-1, string.length);
@@ -196,17 +201,19 @@
         return array;
     }
 
+    
     getId('log_out').addEventListener('click', logOut); //登出按鈕
 
     function logOut() {
         window.location.href = '/';
     } //登出
 
-    //getId('insert').addEventListener('click', insert); //新增至購物車按鈕
+    
     setTimeout(clean,10)
+    //清空表單
     function clean() {
         console.log("clean")
-        getId("id_amount").value = ""  //清空新增至購物車表單
+        getId("id_amount").value = ""  
         getId("id_cId").value = "" 
         getId("id_product").value = ""
         document.getElementsByName("cId")[0].value = ""
@@ -214,7 +221,7 @@
         document.getElementsByName("cId")[2].value = ""
     }
 
-
+    //評分
     async function eva(status, id) { //評分按鈕
         if (status == "已送達") {
             let grade = prompt("請填入評價滿意度(1~5)");
@@ -224,10 +231,12 @@
                 return;
             }
             else {
+                //將資料包成json格式
                 let data = {
                     "grade": grade,
                     "id": id
                 }
+                //將資料傳至後端
                 const rawResponse = await fetch('http://127.0.0.1:8000/customerMain', {
                     method: 'POST',
                     headers: {

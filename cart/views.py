@@ -67,7 +67,7 @@ def deliveryBoy(request):  # 物流人員主頁面
                     (cId,),# 更新訂單狀態為"已寄送"
                 ):
                     error.append(
-                        "can not deliver, as no this product Id"
+                        "無法寄送不存在的訂單"
                     )  # product is none
                 else:
                     cursor.execute(
@@ -150,7 +150,7 @@ def sellerMain(request):  # 商家主頁面
                     (cId,),
                 ):  # 更新訂單狀態為"處理中"
                     error.append(
-                        "不能確認不存在的訂單"
+                        "無法確認不存在的訂單"
                     )  # product is none
                 else:
                     cursor.execute(
@@ -165,7 +165,7 @@ def sellerMain(request):  # 商家主頁面
                     (cId,), # 更新訂單狀態為"寄送中"
                 ):
                     error.append(
-                        "can not deliver, as no this product Id"
+                        "無法出貨不存在的訂單"
                     )  # product is none
                 else:
                     cursor.execute(
