@@ -194,7 +194,7 @@ def sellerMain(request):  # 商家主頁面
         sell_deliver_products = cursor.fetchall() # 取得所有訂單狀態為"處理中"的訂單
 
         # select 出所有商品
-        cursor.execute("SELECT * FROM cart_shopcart JOIN cart_product ON cart_shopcart.product = cart_product.no WHERE cart_product.user = '%s';",(user,))
+        cursor.execute("SELECT * FROM  cart_product WHERE cart_product.user = '%s';",(user,))
         all_products = cursor.fetchall() # 取得所有商品
 
         cursor.execute(
@@ -356,6 +356,7 @@ def customerMain(request):  # 客戶主頁面
         cart_products = cursor.fetchall() # 取得該使用者的購物車商品
         cursor.execute("select * from cart_product where `stock` > 0")  # select 出所有還有庫存的商品
         all_products = cursor.fetchall() # 取得所有還有庫存的商品
+
         cursor.execute(
             "select `product`, `amount` from cart_shopcart where `paid` = 1 and `delivered` = 0"
         )  # select 出已經被下單的商品
